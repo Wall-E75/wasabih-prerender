@@ -1,0 +1,20 @@
+{
+  "name": "wasabih-prerender",
+  "version": "1.0.0",
+  "description": "Prerender server for Wasabih social sharing",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["prerender", "open-graph", "wasabih"],
+  "author": "Votre Nom",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.90.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  }
+}
