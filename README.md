@@ -149,22 +149,26 @@ Le serveur détecte automatiquement les bots suivants :
 
 ## 📊 Fonctionnement
 
-### Pour les bots
+### Architecture complète
 ```
-1. Bot visite https://wasabih.com/events/halal-expo-2025
-2. Cloudflare Worker détecte le bot
-3. Worker redirige vers prerender.wasabih.com/events/halal-expo-2025
-4. Serveur prerender génère HTML avec Open Graph
-5. Bot reçoit le HTML et affiche l'aperçu
+Internet
+    ↓
+Reverse Proxy / Edge Service
+(détection bot vs humain)
+    ↓
+    ├─ Bot → prerender.wasabih.com (ce serveur)
+    │         └─ Génère HTML Open Graph
+    │
+    └─ Humain → wasabih.com (React app)
+              └─ Application normale
 ```
 
-### Pour les humains
-```
-1. Humain visite https://wasabih.com/events/halal-expo-2025
-2. Cloudflare Worker détecte l'humain
-3. Redirige directement vers l'application React (Lovable)
-4. Application normale s'affiche
-```
+**Technologies possibles :**
+- Nginx (reverse proxy)
+- Alibaba Cloud ESA (edge computing)
+- Cloudflare Workers (edge computing)
+- Serveur Node.js custom
+
 
 ## 📝 Balises Open Graph générées
 
@@ -241,8 +245,6 @@ curl http://localhost:3000/debug -A "facebookexternalhit/1.1"
 Stagiaire Développeur Full-Stack chez Wasabih
 
 
-ISC
-
 ## 🤝 Contribution
 
 Ce projet fait partie du stage chez Wasabih. Pour toute question ou suggestion, contactez l'équipe technique.
@@ -250,4 +252,4 @@ Ce projet fait partie du stage chez Wasabih. Pour toute question ou suggestion, 
 ---
 
 **Version** : 2.0.0  
-**Dernière mise à jour** : [16/01/2029]
+**Dernière mise à jour** : [16/01/2026]
