@@ -1,7 +1,7 @@
 import express from "express";
 import { isBot } from "../utils/botDetection.js";
 import { generateOgHtml } from "../utils/ogGenerator.js";
-import { mockData } from "../config/supabase.js";
+import { supabase } from "../config/supabase.js";
 
 const router = express.Router();
 /**
@@ -10,7 +10,7 @@ const router = express.Router();
  */
 router.get('/:slug', async (req, res)=> {
     const userAgent = req.headers['user-agent'] || '';
-    const originalHost = req.headers['x-original-host'] || 'wasabih.com';
+    const originalHost = req.headers['x-original-host'] || process.env.MAIN_SITE_UR || 'wasabih.com';
     const { slug } = req.params;
 
     console.log('Request for /events/' + slug);
@@ -20,35 +20,54 @@ router.get('/:slug', async (req, res)=> {
     // Si humain → rediriger vers Wasabih
     if (!isBot(userAgent)) {
         console.log('Human detected → redirect to Wasabih');
-        return res.redirect(302, `https://${originalHost}/events/${slug}`);
+        const redirectUrl = `${originalHost.startsWith('http') ? originalHost : 'https://' + originalHost}/events/${slug}`;
+        return res.redirect(302, redirectUrl);
     }
 
     console.log('Bot detected → generate OG HTML');
 
-    // Récupérer l'événement (mockData pour l'instant)
-    const event = mockData.events[slug];
-  
-    if (!event) {
-        console.log('Event not found');
-        return res.status(404).send('Event not found');
+    try {
+        // Fetch depuis supabase
+        const { data: event, error } = await supabase
+            .from("events")
+            .select("*")
+            .eq("slug", slug)
+            .single();
+
+        if (error) {
+            console.log("Supabase error: ", error.message);
+            return res.status(500).send("Error fetching event");
+        }
+
+        if (!event) {
+            console.log('Event not found');
+            return res.status(404).send('Event not found');
+        }
+
+        console.log('✅ Event found:', event.title || event.name);
+
+         //Générer le html Open Graph
+
+        const html = generateOgHtml({
+            type: 'events',
+            slug: event.slug,
+            title: event.title || event.name,
+            description: event.description || "Event on Wasabih",
+            image: event.image_url || event.cover_image || process.env.DEFAULT_OG_IMAGE,
+            url: `${originalHost.startsWith("http") ? originalHost : "https://" + originalHost}/events/${slug}`
+        });
+
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        res.send(html);
+    } catch (err) {
+        console.log('Catch error:', err);
+        return res.status(500).send('Server error');
     }
-  
-    console.log('✅ Event found:', event.title);
 
-    //Générer le html Open Graph
 
-    const html = generateOgHtml({
-        type: 'events',
-        slug: event.slug,
-        title: event.title,
-        description: event.description,
-        image: event.image_url,
-        url: `https://${originalHost}/events/${slug}`
-    });
 
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.send(html);
+    
 });
 
 export default router;

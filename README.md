@@ -202,8 +202,7 @@ Le serveur génère automatiquement les balises suivantes :
 - [ ] Intégration Supabase (en attente credentials)
 - [ ] Déploiement sur prerender.wasabih.com
 - [ ] Tests avec Facebook/LinkedIn Debugger en production
-- [ ] Gestion du cache (optionnel)
-- [ ] Monitoring et logs (optionnel)
+
 
 ## 🐛 Debugging
 
