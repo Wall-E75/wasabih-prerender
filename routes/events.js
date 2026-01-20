@@ -30,7 +30,7 @@ router.get('/:slug', async (req, res)=> {
         // Fetch depuis supabase
         const { data: event, error } = await supabase
             .from("events")
-            .select("*")
+            .select('slug, title, description, banner_image_url, country, city, start_date, end_date')
             .eq("slug", slug)
             .single();
 
@@ -53,7 +53,7 @@ router.get('/:slug', async (req, res)=> {
             slug: event.slug,
             title: event.title || event.name,
             description: event.description || "Event on Wasabih",
-            image: event.image_url || event.cover_image || process.env.DEFAULT_OG_IMAGE,
+            image: event.banner_image_url || process.env.DEFAULT_OG_IMAGE,
             url: `${originalHost.startsWith("http") ? originalHost : "https://" + originalHost}/events/${slug}`
         });
 

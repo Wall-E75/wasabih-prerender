@@ -30,7 +30,7 @@ router.get('/:slug', async (req, res)=> {
         // Fetch depuis supabase
         const { data: companie, error } = await supabase
             .from("companies")
-            .select("*")
+            .select("slug, name, description, logo_url, country, city")
             .eq("slug", slug)
             .single();
 
@@ -44,16 +44,25 @@ router.get('/:slug', async (req, res)=> {
             return res.status(404).send('Companie not found');
         }
 
-        console.log('✅ Companies found:', companie.title || companie.name);
+        console.log('✅ Companies found:', companie.name);
+        // Construire la description enrichie
+        let companyDescription = company.description || 'Company in the halal economy sector';
+        
+        // Enrichir avec la localisation si disponible
+        if (company.city && company.country) {
+            companyDescription = `${companyDescription} | Based in ${company.city}, ${company.country}`;
+        } else if (company.country) {
+            companyDescription = `${companyDescription} | Based in ${company.country}`;
+        }
 
          //Générer le html Open Graph
 
         const html = generateOgHtml({
             type: 'companies',
             slug: companie.slug,
-            title: companie.title || companie.name,
-            description: companie.description || "Companie on Wasabih",
-            image: companie.image_url || companie.cover_image || process.env.DEFAULT_OG_IMAGE,
+            title: companie.name,
+            description: companyDescription,
+            image: companie.logo_url || process.env.DEFAULT_OG_IMAGE,
             url: `${originalHost.startsWith("http") ? originalHost : "https://" + originalHost}/companies/${slug}`
         });
 
