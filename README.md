@@ -15,12 +15,14 @@ wasabih-prerender/
 ├── routes/
 │   ├── events.js         # Routes pour les événements
 │   ├── people.js         # Routes pour les profils
-│   └── companies.js      # Routes pour les entreprises
+│   ├── companies.js      # Routes pour les entreprises
+│   ├── insights.js       # Routes pour les insights
+│   └── institutions.js  # Routes pour les institutions
 ├── utils/
 │   ├── botDetection.js   # Détection des bots de réseaux sociaux
 │   └── ogGenerator.js    # Génération du HTML Open Graph
 ├── config/
-│   └── supabase.js       # Configuration Supabase et données mockées
+│   └── supabase.js       # Configuration Supabase
 ├── package.json
 ├── .env
 └── .gitignore
@@ -65,13 +67,17 @@ npm start
 
 Créez un fichier `.env` à la racine du projet :
 ```env
-# Supabase
+# Supabase Configuration
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+SUPABASE_ANON_KEY=your_anon_key_here
+# SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here (si nécessaire)
 
-# Serveur
-PORT=3000
-NODE_ENV=development
+# Server Configuration
+PORT=3099
+MAIN_SITE_URL=https://wasabih.com
+
+# Default OG Image (fallback when no image is available)
+DEFAULT_OG_IMAGE=https://storage.googleapis.com/your-bucket/default-og-image.png
 ```
 
 ## 🚀 Utilisation
@@ -85,7 +91,7 @@ npm run dev
 npm start
 ```
 
-Le serveur démarre sur `http://localhost:3000`
+Le serveur démarre sur `http://localhost:3099`
 
 ### Routes disponibles
 
@@ -94,6 +100,8 @@ Le serveur démarre sur `http://localhost:3000`
 - **GET** `/events/:slug` - Prerender pour les événements
 - **GET** `/people/:slug` - Prerender pour les profils
 - **GET** `/companies/:slug` - Prerender pour les entreprises
+- **GET** `/insights/:slug` - Prerender pour les insights
+- **GET** `/institutions/:slug` - Prerender pour les institutions
 
 #### Routes de test
 
@@ -106,13 +114,14 @@ Le serveur démarre sur `http://localhost:3000`
 ### Tester la détection de bots
 ```bash
 # Simuler un bot Facebook
-curl -A "facebookexternalhit/1.1" http://localhost:3000/events/halal-expo-2025
+# Events
+curl -A "facebookexternalhit/1.1" http://localhost:3099/[ROUTE]/[SLUG]
 
 # Simuler un bot LinkedIn
-curl -A "LinkedInBot/1.0" http://localhost:3000/people/john-doe
+curl -A "LinkedInBot/1.0" http://localhost:3099/[ROUTE]/[SLUG]
 
 # Simuler un humain (sera redirigé)
-curl -L http://localhost:3000/events/halal-expo-2025
+curl -L http://localhost:3099/[ROUTE]/[SLUG]
 ```
 
 ### Tester avec les outils des réseaux sociaux
@@ -192,17 +201,36 @@ Le serveur génère automatiquement les balises suivantes :
 <meta property="og:locale" content="fr_FR">
 ```
 
+## 🔐 Caractères échappés (Sécurité)
+
+Pour éviter les injections XSS, certains caractères sont automatiquement échappés dans le HTML généré :
+```html
+& → &amp;
+< → &lt;
+> → &gt;
+" → &quot;
+' → &#039;
+```
+
+**Exemple :**
+```
+Titre original:  "Halal Expo & Conference"
+Dans le HTML:    "Halal Expo &amp; Conference"
+Affiché par bot: "Halal Expo & Conference"
+```
+
+Ceci est **normal et souhaité** pour la sécurité. Les navigateurs et bots décodent automatiquement ces caractères lors de l'affichage.
+
 ## 🚧 TODO / Roadmap
 
 - [x] Architecture modulaire
 - [x] Détection de bots
 - [x] Génération HTML Open Graph
-- [x] Routes events, people, companies
+- [x] Routes events, people, companies, insights, institutions
 - [x] Sécurité (escape HTML)
-- [ ] Intégration Supabase (en attente credentials)
+- [x] Intégration Supabase
 - [ ] Déploiement sur prerender.wasabih.com
 - [ ] Tests avec Facebook/LinkedIn Debugger en production
-
 
 ## 🐛 Debugging
 
@@ -221,10 +249,10 @@ cat .env
 ### Les bots ne sont pas détectés
 ```bash
 # Tester la détection
-curl http://localhost:3000/debug -A "facebookexternalhit/1.1"
+curl http://localhost:3099/debug -A "facebookexternalhit/1.1"
 
 # Vérifier les logs du serveur
-# Les logs affichent : 🤖 Bot detected ou 👤 Human detected
+# Les logs affichent : Bot detected ou Human detected
 ```
 
 ### HTML mal formaté
@@ -243,6 +271,8 @@ curl http://localhost:3000/debug -A "facebookexternalhit/1.1"
 **Sylla Wali**  
 Stagiaire Développeur Full-Stack chez Wasabih
 
+## Lisence
+ISC
 
 ## 🤝 Contribution
 
@@ -251,4 +281,4 @@ Ce projet fait partie du stage chez Wasabih. Pour toute question ou suggestion, 
 ---
 
 **Version** : 2.0.0  
-**Dernière mise à jour** : [16/01/2026]
+**Dernière mise à jour** : [20/01/2026]
