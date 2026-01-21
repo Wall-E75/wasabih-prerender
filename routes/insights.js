@@ -30,7 +30,7 @@ router.get('/:slug', async (req, res)=> {
         // Fetch depuis supabase
         const { data: insight, error } = await supabase
             .from("insights")
-            .select("*")
+            .select('slug, title, summary, featured_image_url, category, author, publish_date')
             .eq("slug", slug)
             .single();
 
@@ -44,16 +44,29 @@ router.get('/:slug', async (req, res)=> {
             return res.status(404).send('Insight not found');
         }
 
-        console.log('Insight found:', insight.title || insight.name);
+        console.log('Insight found:', insight.title);
+
+        // Construire la description enrichie
+        let insightDescription = insight.summary || 'Insight on Wasabih';
+        
+        // Enrichir avec l'auteur si disponible
+        if (insight.author) {
+            insightDescription = `By ${insight.author} | ${insightDescription}`;
+        }
+        
+        // Enrichir avec la catégorie si disponible
+        if (insight.category) {
+            insightDescription = `${insightDescription} | ${insight.category}`;
+        }
 
          //Générer le html Open Graph
 
         const html = generateOgHtml({
             type: 'insights',
             slug: insight.slug,
-            title: insight.title || insight.name,
-            description: insight.description || "Insight on Wasabih",
-            image: insight.image_url || insight.cover_image || process.env.DEFAULT_OG_IMAGE,
+            title: insight.title,
+            description: insightDescription,
+            image: insight.featured_image_url || process.env.DEFAULT_OG_IMAGE,
             url: `${originalHost.startsWith("http") ? originalHost : "https://" + originalHost}/insights/${slug}`
         });
 
@@ -64,9 +77,6 @@ router.get('/:slug', async (req, res)=> {
         console.log('Catch error:', err);
         return res.status(500).send('Server error');
     }
-
-
-
     
 });
 

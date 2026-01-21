@@ -30,7 +30,7 @@ router.get('/:slug', async (req, res)=> {
         // Fetch depuis supabase
         const { data: institution, error } = await supabase
             .from("institutions")
-            .select("*")
+            .select("slug, name, description, logo_url, type, country_region")
             .eq("slug", slug)
             .single();
 
@@ -44,16 +44,29 @@ router.get('/:slug', async (req, res)=> {
             return res.status(404).send('Institution not found');
         }
 
-        console.log('Institution found:', institution.title || institution.name);
+        console.log('Institution found:', institution.name);
+
+        // / Construire la description enrichie
+        let institutionDescription = institution.description || 'Institution in the halal economy sector';
+    
+        // Enrichir avec le type si disponible
+        if (institution.type) {
+            institutionDescription = `${institution.type} | ${institutionDescription}`;
+        }
+    
+        // Enrichir avec la localisation si disponible
+        if (institution.country_region) {
+            institutionDescription = `${institutionDescription} | ${institution.country_region}`;
+        }
 
          //Générer le html Open Graph
 
         const html = generateOgHtml({
             type: 'institutions',
             slug: institution.slug,
-            title: institution.title || institution.name,
-            description: institution.description || "Institution on Wasabih",
-            image: institution.image_url || institution.cover_image || process.env.DEFAULT_OG_IMAGE,
+            title: institution.name,
+            description: institutionDescription,
+            image: institution.logo_url || process.env.DEFAULT_OG_IMAGE,
             url: `${originalHost.startsWith("http") ? originalHost : "https://" + originalHost}/institutions/${slug}`
         });
 
@@ -64,9 +77,6 @@ router.get('/:slug', async (req, res)=> {
         console.log('Catch error:', err);
         return res.status(500).send('Server error');
     }
-
-
-
     
 });
 
