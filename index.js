@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import eventsRouter from './routes/events.js';
 import peopleRouter from './routes/people.js';
 import companiesRouter from './routes/companies.js';
+import insightsRouter from './routes/insights.js';
+import institutionsRouter from './routes/institutions.js';
 import { isBot } from './utils/botDetection.js';
 
 dotenv.config();
@@ -24,6 +26,8 @@ app.get('/', (req, res) => {
       events: '/events/:slug',
       people: '/people/:slug',
       companies: '/companies/:slug',
+      insights: '/insights/:slug',
+      institutions: '/institutions/:slug',
       debug: '/debug',
       test_bot: '/test-bot'
     }
@@ -67,6 +71,8 @@ app.get('/test-bot', (req, res) => {
 app.use('/events', eventsRouter);
 app.use('/people', peopleRouter);
 app.use('/companies', companiesRouter);
+app.use('/insights', insightsRouter);
+app.use('/institutions', institutionsRouter);
 
 // ==========================================
 // DÉMARRAGE SERVEUR
@@ -89,6 +95,8 @@ app.listen(PORT, () => {
   console.log(`   • Events:       http://localhost:${PORT}/events/:slug`);
   console.log(`   • People:       http://localhost:${PORT}/people/:slug`);
   console.log(`   • Companies:    http://localhost:${PORT}/companies/:slug`);
+  console.log(`   • Insights:     http://localhost:${PORT}/insights/:slug`);
+  console.log(`   • Institutions: http://localhost:${PORT}/institutions/:slug`);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('');
 });
