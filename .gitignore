@@ -49,3 +49,6 @@ coverage/
 
 # PM2
 .pm2/
+
+# Scripts
+list-events.js
