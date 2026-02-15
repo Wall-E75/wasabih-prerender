@@ -32,6 +32,7 @@ export function generateOgHtml({ type, slug, title, description, image, url }) {
                 <meta property="og:title" content="${safeTitle}">
                 <meta property="og:description" content="${safeDescription}">
                 <meta property="og:image" content="${safeImage}">
+                <meta property="og:image:type" content="image/png">
                 
                 <!-- Twitter -->
                 <meta name="twitter:card" content="summary_large_image">
@@ -40,6 +41,11 @@ export function generateOgHtml({ type, slug, title, description, image, url }) {
                 <meta name="twitter:description" content="${safeDescription}">
                 <meta name="twitter:image" content="${safeImage}">
                 
+                <!-- Telegram -->
+                <meta name="telegram:card" content="summary_large_image">
+                <meta property="og:image:width" content="1200">
+                <meta property="og:image:height" content="630">
+
                 <!-- WhatsApp -->
                 <meta property="og:site_name" content="Wasabih">
                 <meta property="og:locale" content="fr_FR">
@@ -47,7 +53,7 @@ export function generateOgHtml({ type, slug, title, description, image, url }) {
                 <title>${safeTitle}</title>
                 
                 <!-- Redirection automatique vers l'app -->
-                <meta http-equiv="refresh" content="0; url=${safeUrl}">
+                <meta http-equiv="refresh" content="2; url=${safeUrl}">
             </head>
             <body>
                 <h1>${safeTitle}</h1>
