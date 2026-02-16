@@ -10,6 +10,35 @@ import { isBot } from './utils/botDetection.js';
 dotenv.config();
 
 const app = express();
+// ============================================================
+// ROBOTS.TXT - Autoriser tous les bots (IMPORTANT pour Facebook)
+// ============================================================
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: Googlebot
+Allow: /`);
+});
 const PORT = process.env.PORT || 3000;
 
 // ==========================================
