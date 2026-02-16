@@ -10,7 +10,7 @@ const router = express.Router();
  */
 router.get('/:slug', async (req, res)=> {
     const userAgent = req.headers['user-agent'] || '';
-    const originalHost = req.headers['x-original-host'] || process.env.MAIN_SITE_UR || 'wasabih.com';
+    const originalHost = req.headers['x-original-host'] || process.env.MAIN_SITE_URL || 'wasabih.com';
     const { slug } = req.params;
 
     console.log('Request for /companies/' + slug);
@@ -28,7 +28,7 @@ router.get('/:slug', async (req, res)=> {
 
     try {
         // Fetch depuis supabase
-        const { data: companie, error } = await supabase
+        const { data: company, error } = await supabase
             .from("companies")
             .select("slug, name, description, logo_url, country, city")
             .eq("slug", slug)
@@ -36,18 +36,18 @@ router.get('/:slug', async (req, res)=> {
 
         if (error) {
             console.log("Supabase error: ", error.message);
-            return res.status(500).send("Error fetching companie");
+            return res.status(500).send("Error fetching company");
         }
 
-        if (!companie) {
-            console.log('Companie not found');
-            return res.status(404).send('Companie not found');
+        if (!company) {
+            console.log('Company not found');
+            return res.status(404).send('Company not found');
         }
 
-        console.log('✅ Companies found:', companie.name);
+        console.log('✅ Company found:', company.name);
         // Construire la description enrichie
         let companyDescription = company.description || 'Company in the halal economy sector';
-        
+
         // Enrichir avec la localisation si disponible
         if (company.city && company.country) {
             companyDescription = `${companyDescription} | Based in ${company.city}, ${company.country}`;
@@ -59,10 +59,10 @@ router.get('/:slug', async (req, res)=> {
 
         const html = generateOgHtml({
             type: 'companies',
-            slug: companie.slug,
-            title: companie.name,
+            slug: company.slug,
+            title: company.name,
             description: companyDescription,
-            image: companie.logo_url || process.env.DEFAULT_OG_IMAGE,
+            image: company.logo_url || process.env.DEFAULT_OG_IMAGE,
             url: `${originalHost.startsWith("http") ? originalHost : "https://" + originalHost}/companies/${slug}`
         });
 

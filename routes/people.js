@@ -59,7 +59,7 @@ router.get('/:slug', async (req, res) => {
             profile.headline || 
             profile.professional_role || 
             profile.title ||
-            (profile.organization ? `Prfessional at ${profile.organization}` : null ) || 
+            (profile.organization ? `Professional at ${profile.organization}` : null ) || 
             'Professional in the halal economy sector'
         
         // Générer le HTML Open Graph

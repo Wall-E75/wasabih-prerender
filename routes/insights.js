@@ -10,7 +10,7 @@ const router = express.Router();
  */
 router.get('/:slug', async (req, res)=> {
     const userAgent = req.headers['user-agent'] || '';
-    const originalHost = req.headers['x-original-host'] || process.env.MAIN_SITE_UR || 'wasabih.com';
+    const originalHost = req.headers['x-original-host'] || process.env.MAIN_SITE_URL || 'wasabih.com';
     const { slug } = req.params;
 
     console.log('Request for /insights/' + slug);

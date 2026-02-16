@@ -32,7 +32,7 @@ export function generateOgHtml({ type, slug, title, description, image, url }) {
                 <meta property="og:title" content="${safeTitle}">
                 <meta property="og:description" content="${safeDescription}">
                 <meta property="og:image" content="${safeImage}">
-                <meta property="og:image:type" content="image/png">
+                <meta property="og:image:type" content="${safeImage.match(/\\.jpe?g/i) ? 'image/jpeg' : safeImage.match(/\\.webp/i) ? 'image/webp' : 'image/png'}">
                 
                 <!-- Twitter -->
                 <meta name="twitter:card" content="summary_large_image">
